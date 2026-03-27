@@ -52,13 +52,19 @@ RUN mkdir -p storage/logs \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
+# Redirigir el error log principal de nginx a stderr
+RUN sed -i 's|error_log /var/log/nginx/error.log warn;|error_log /dev/stderr warn;|' /etc/nginx/nginx.conf || true
+
 # Generar nginx config (sin CRLF de Windows)
 RUN printf 'server {\n\
     listen %s;\n\
     root /var/www/html/public;\n\
     index index.php;\n\
-    error_log /dev/stderr warn;\n\
-    access_log /dev/stdout;\n\
+    access_log off;\n\
+    location /ping {\n\
+        return 200 "pong";\n\
+        add_header Content-Type text/plain;\n\
+    }\n\
     location / {\n\
         try_files $uri $uri/ /index.php?$query_string;\n\
     }\n\
