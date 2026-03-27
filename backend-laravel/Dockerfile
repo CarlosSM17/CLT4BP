@@ -24,16 +24,8 @@ RUN docker-php-ext-install pdo pdo_pgsql mbstring xml bcmath opcache gd \
 # Habilitar mod_rewrite para Laravel
 RUN a2enmod rewrite
 
-# Configurar Apache: document root apunta a /public y escucha en $PORT
-RUN echo '<VirtualHost *:${PORT}>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
-    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+# Apache config: document root en /public, puerto 8080
+COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -64,6 +56,10 @@ RUN mkdir -p storage/logs \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-EXPOSE ${PORT:-8000}
+# Entrypoint script
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link && php artisan config:cache && php artisan route:cache && sed -i \"s/\\${PORT}/${PORT:-8000}/g\" /etc/apache2/sites-available/000-default.conf && sed -i \"s/^Listen 80$/Listen ${PORT:-8000}/\" /etc/apache2/ports.conf && apache2-foreground"]
+EXPOSE 8080
+
+ENTRYPOINT ["entrypoint.sh"]
