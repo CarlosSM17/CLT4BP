@@ -27,6 +27,9 @@ RUN a2enmod rewrite
 # Apache config: document root en /public, puerto 8080
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
+# Cambiar puerto de Apache a 8080 en tiempo de build
+RUN sed -i 's/^Listen 80$/Listen 8080/' /etc/apache2/ports.conf
+
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -56,10 +59,6 @@ RUN mkdir -p storage/logs \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# Entrypoint script (generado en build para evitar CRLF de Windows)
-RUN printf '#!/bin/bash\nset -e\nAPP_PORT=${PORT:-8080}\necho "Starting Laravel on port $APP_PORT"\nsed -i "s/8080/$APP_PORT/g" /etc/apache2/sites-available/000-default.conf\nsed -i "s/^Listen 80$/Listen $APP_PORT/" /etc/apache2/ports.conf\nphp artisan migrate --force\nphp artisan storage:link || true\nphp artisan config:cache\nphp artisan route:cache\nexec apache2-foreground\n' > /usr/local/bin/entrypoint.sh \
-    && chmod +x /usr/local/bin/entrypoint.sh
-
 EXPOSE 8080
 
-ENTRYPOINT ["entrypoint.sh"]
+CMD ["bash", "-c", "php artisan migrate --force && (php artisan storage:link || true) && php artisan config:cache && php artisan route:cache && apache2-foreground"]
