@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post('http://localhost:8000/api/register', userData);
+            const response = await axios.post('/api/register', userData);
             user.value = response.data.user;
             setToken(response.data.access_token);
             window.location.href = '/dashboard';
@@ -44,7 +44,7 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post('http://localhost:8000/api/login', credentials);
+            const response = await axios.post('/api/login', credentials);
             user.value = response.data.user;
             setToken(response.data.access_token);
             window.location.href = '/dashboard';
@@ -59,7 +59,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const logout = async () => {
         try {
-            await axios.post('http://localhost:8000/api/logout');
+            await axios.post('/api/logout');
         } catch (err) {
             console.error('Error en logout:', err);
         } finally {
@@ -70,7 +70,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const fetchUser = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/me');
+            const response = await axios.get('/api/me');
             user.value = response.data.user;
         } catch (err) {
             clearAuth();

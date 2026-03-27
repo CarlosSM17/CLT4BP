@@ -300,7 +300,7 @@ const loadCoursePendingGrading = async () => {
   try {
     loading.value = true;
     const response = await axios.get(
-      `http://localhost:8000/api/courses/${courseId.value}/pending-grading`
+      `/api/courses/${courseId.value}/pending-grading`
     );
     gradingSummary.value = response.data.grading_summary;
     courseName.value = response.data.course?.title || '';
@@ -317,7 +317,7 @@ const viewPendingResponses = async (assessment) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8000/api/courses/${courseId.value}/assessments/${assessment.id}/pending-grading`
+      `/api/courses/${courseId.value}/assessments/${assessment.id}/pending-grading`
     );
     pendingResponses.value = response.data.pending_responses;
     gradingStats.value = response.data.stats;
@@ -332,7 +332,7 @@ const viewPendingResponses = async (assessment) => {
 const gradeResponse = async (response) => {
   try {
     const result = await axios.get(
-      `http://localhost:8000/api/courses/${courseId.value}/assessments/${selectedAssessment.value.id}/responses/${response.id}/grading`
+      `/api/courses/${courseId.value}/assessments/${selectedAssessment.value.id}/responses/${response.id}/grading`
     );
 
     responseToGrade.value = result.data.response;
@@ -372,7 +372,7 @@ const submitGrade = async () => {
     }
 
     await axios.post(
-      `http://localhost:8000/api/courses/${courseId.value}/assessments/${selectedAssessment.value.id}/responses/${responseToGrade.value.id}/grade`,
+      `/api/courses/${courseId.value}/assessments/${selectedAssessment.value.id}/responses/${responseToGrade.value.id}/grade`,
       { grades: gradesArray }
     );
 
@@ -427,7 +427,7 @@ const recalculateGradingStatus = async () => {
   recalculating.value = true;
   try {
     const response = await axios.post(
-      `http://localhost:8000/api/courses/${courseId.value}/recalculate-grading`
+      `/api/courses/${courseId.value}/recalculate-grading`
     );
     alert(response.data.message);
     await loadCoursePendingGrading();

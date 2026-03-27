@@ -13,7 +13,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.get(`http://localhost:8000/api/courses/${courseId}/assessments`);
+            const response = await axios.get(`/api/courses/${courseId}/assessments`);
             assessments.value = response.data.assessments;
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al cargar evaluaciones';
@@ -27,7 +27,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.get(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}`);
+            const response = await axios.get(`/api/courses/${courseId}/assessments/${assessmentId}`);
             currentAssessment.value = response.data.assessment;
             return response.data.assessment;
         } catch (err) {
@@ -42,7 +42,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post(`http://localhost:8000/api/courses/${courseId}/assessments`, assessmentData);
+            const response = await axios.post(`/api/courses/${courseId}/assessments`, assessmentData);
             assessments.value.unshift(response.data.assessment);
             return response.data.assessment;
         } catch (err) {
@@ -57,7 +57,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.put(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}`, assessmentData);
+            const response = await axios.put(`/api/courses/${courseId}/assessments/${assessmentId}`, assessmentData);
             const index = assessments.value.findIndex(a => a.id === assessmentId);
             if (index !== -1) {
                 assessments.value[index] = response.data.assessment;
@@ -75,7 +75,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            await axios.delete(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}`);
+            await axios.delete(`/api/courses/${courseId}/assessments/${assessmentId}`);
             assessments.value = assessments.value.filter(a => a.id !== assessmentId);
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al eliminar evaluación';
@@ -89,7 +89,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}/toggle`);
+            const response = await axios.post(`/api/courses/${courseId}/assessments/${assessmentId}/toggle`);
             const index = assessments.value.findIndex(a => a.id === assessmentId);
             if (index !== -1) {
                 assessments.value[index] = response.data.assessment;
@@ -108,7 +108,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}/start`);
+            const response = await axios.post(`/api/courses/${courseId}/assessments/${assessmentId}/start`);
             currentResponse.value = response.data.response;
             return response.data.response;
         } catch (err) {
@@ -123,7 +123,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}/save`, {
+            const response = await axios.post(`/api/courses/${courseId}/assessments/${assessmentId}/save`, {
                 responses,
                 is_final: isFinal,
             });
@@ -141,7 +141,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.get(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}/my-response`);
+            const response = await axios.get(`/api/courses/${courseId}/assessments/${assessmentId}/my-response`);
             currentResponse.value = response.data.response;
             return response.data.response;
         } catch (err) {
@@ -156,7 +156,7 @@ export const useAssessmentStore = defineStore('assessments', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.get(`http://localhost:8000/api/courses/${courseId}/assessments/${assessmentId}/responses`);
+            const response = await axios.get(`/api/courses/${courseId}/assessments/${assessmentId}/responses`);
             return response.data;
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al cargar respuestas';

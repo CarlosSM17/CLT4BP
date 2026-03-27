@@ -333,12 +333,12 @@ onMounted(async () => {
   try {
     // Cargar plantillas disponibles para el curso
     const response = await axios.get(
-      `http://localhost:8000/api/courses/${route.params.courseId}/available-templates`
+      `/api/courses/${route.params.courseId}/available-templates`
     );
     availableTemplates.value = response.data.available_templates || [];
 
     // Cargar todas las plantillas para referencia
-    const allResponse = await axios.get('http://localhost:8000/api/assessment-templates');
+    const allResponse = await axios.get('/api/assessment-templates');
     allTemplates.value = allResponse.data.templates || [];
   } catch (err) {
     console.error('Error al cargar plantillas:', err);
@@ -396,7 +396,7 @@ const loadTemplateQuestions = async () => {
   try {
     // Obtener detalles completos de la plantilla
     const response = await axios.get(
-      `http://localhost:8000/api/assessment-templates/${templateForType.value.id}`
+      `/api/assessment-templates/${templateForType.value.id}`
     );
 
     const template = response.data.template;
@@ -424,7 +424,7 @@ const createFromTemplate = async (template) => {
   try {
     // Crear evaluaci\u00f3n directamente desde la plantilla usando el endpoint
     const response = await axios.post(
-      `http://localhost:8000/api/courses/${route.params.courseId}/assessments/from-template/${template.id}`
+      `/api/courses/${route.params.courseId}/assessments/from-template/${template.id}`
     );
 
     // Redirigir a la lista de evaluaciones

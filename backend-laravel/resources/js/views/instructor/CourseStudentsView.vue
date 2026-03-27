@@ -214,7 +214,7 @@ const loadData = async () => {
     enrolledStudents.value = await courseStore.getCourseStudents(route.params.id);
 
     // Cargar todos los estudiantes disponibles
-    const response = await axios.get('http://localhost:8000/api/users', {
+    const response = await axios.get('/api/users', {
       params: { role: 'student' }
     });
 

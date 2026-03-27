@@ -87,7 +87,7 @@ const formatDate = (dateString) => {
 const fetchEnrollments = async () => {
   try {
     loading.value = true;
-    const response = await axios.get('http://localhost:8000/api/my-enrollments');
+    const response = await axios.get('/api/my-enrollments');
     enrollments.value = response.data.enrollments;
   } catch (error) {
     console.error('Error al cargar cursos:', error);

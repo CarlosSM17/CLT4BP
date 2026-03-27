@@ -170,7 +170,7 @@ const handleSubmit = async () => {
   try {
     loading.value = true;
 
-    const response = await axios.post('http://localhost:8000/api/users/instructors', form.value);
+    const response = await axios.post('/api/users/instructors', form.value);
 
     success.value = `Instructor ${response.data.user.name} creado exitosamente`;
 

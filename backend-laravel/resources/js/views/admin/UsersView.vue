@@ -239,7 +239,7 @@ const loadUsers = async () => {
     if (filters.value.role) {
       params.role = filters.value.role;
     }
-    const response = await axios.get('http://localhost:8000/api/users', { params });
+    const response = await axios.get('/api/users', { params });
     users.value = response.data.users;
   } catch (err) {
     error.value = err.response?.data?.message || 'Error al cargar usuarios';
@@ -300,7 +300,7 @@ const confirmDeactivate = (user) => {
 const deactivateUser = async () => {
   try {
     deactivating.value = true;
-    await axios.delete(`http://localhost:8000/api/users/${selectedUser.value.id}/deactivate`);
+    await axios.delete(`/api/users/${selectedUser.value.id}/deactivate`);
     closeModal();
     loadUsers();
   } catch (err) {

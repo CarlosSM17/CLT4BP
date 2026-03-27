@@ -189,11 +189,11 @@ const fetchData = async () => {
     error.value = null;
 
     // Cargar información del curso
-    const courseResponse = await axios.get(`http://localhost:8000/api/courses/${route.params.courseId}`);
+    const courseResponse = await axios.get(`/api/courses/${route.params.courseId}`);
     course.value = courseResponse.data.course;
 
     // Cargar evaluaciones
-    const assessmentsResponse = await axios.get(`http://localhost:8000/api/courses/${route.params.courseId}/assessments`);
+    const assessmentsResponse = await axios.get(`/api/courses/${route.params.courseId}/assessments`);
     assessments.value = assessmentsResponse.data.assessments;
   } catch (err) {
     console.error('Error al cargar datos:', err);

@@ -16,7 +16,7 @@ export const useCourseStore = defineStore('courses', () => {
             if (filters.status) params.status = filters.status;
             if (filters.search) params.search = filters.search;
 
-            const response = await axios.get('http://localhost:8000/api/courses', { params });
+            const response = await axios.get('/api/courses', { params });
             courses.value = response.data.courses;
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al cargar cursos';
@@ -30,7 +30,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.get(`http://localhost:8000/api/courses/${id}`);
+            const response = await axios.get(`/api/courses/${id}`);
             currentCourse.value = response.data.course;
             return response.data.course;
         } catch (err) {
@@ -45,7 +45,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post('http://localhost:8000/api/courses', courseData);
+            const response = await axios.post('/api/courses', courseData);
             courses.value.unshift(response.data.course);
             return response.data.course;
         } catch (err) {
@@ -60,7 +60,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.put(`http://localhost:8000/api/courses/${id}`, courseData);
+            const response = await axios.put(`/api/courses/${id}`, courseData);
             const index = courses.value.findIndex(c => c.id === id);
             if (index !== -1) {
                 courses.value[index] = response.data.course;
@@ -78,7 +78,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            await axios.delete(`http://localhost:8000/api/courses/${id}`);
+            await axios.delete(`/api/courses/${id}`);
             courses.value = courses.value.filter(c => c.id !== id);
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al eliminar curso';
@@ -92,7 +92,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.post(`http://localhost:8000/api/courses/${courseId}/enroll`, {
+            const response = await axios.post(`/api/courses/${courseId}/enroll`, {
                 student_ids: studentIds
             });
             return response.data;
@@ -108,7 +108,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            const response = await axios.get(`http://localhost:8000/api/courses/${courseId}/students`);
+            const response = await axios.get(`/api/courses/${courseId}/students`);
             return response.data.students;
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al cargar estudiantes';
@@ -122,7 +122,7 @@ export const useCourseStore = defineStore('courses', () => {
         try {
             loading.value = true;
             error.value = null;
-            await axios.delete(`http://localhost:8000/api/courses/${courseId}/students/${studentId}`);
+            await axios.delete(`/api/courses/${courseId}/students/${studentId}`);
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al remover estudiante';
             throw err;

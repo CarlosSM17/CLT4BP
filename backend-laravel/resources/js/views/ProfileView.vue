@@ -191,7 +191,7 @@ const updateProfile = async () => {
       return;
     }
 
-    await axios.put(`http://localhost:8000/api/users/${authStore.user.id}`, updateData);
+    await axios.put(`/api/users/${authStore.user.id}`, updateData);
 
     // Actualizar usuario en el store
     if (updateData.name) {
