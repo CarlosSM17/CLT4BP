@@ -69,7 +69,7 @@ RUN printf 'server {\n\
 }\n' "${PORT:-8000}" > /etc/nginx/http.d/default.conf
 
 # Generar supervisord config (sin CRLF de Windows)
-RUN printf '[supervisord]\nnodaemon=true\nlogfile=/dev/null\nlogfile_maxbytes=0\n\n[program:php-fpm]\ncommand=php-fpm\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n\n[program:nginx]\ncommand=nginx -g "daemon off;"\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n' > /etc/supervisor/conf.d/supervisord.conf
+RUN mkdir -p /etc/supervisor/conf.d && printf '[supervisord]\\nnodaemon=true\\nlogfile=/dev/null\\nlogfile_maxbytes=0\\n\\n[program:php-fpm]\\ncommand=php-fpm\\nautostart=true\\nautorestart=true\\nstdout_logfile=/dev/stdout\\nstdout_logfile_maxbytes=0\\nstderr_logfile=/dev/stderr\\nstderr_logfile_maxbytes=0\\n\\n[program:nginx]\\ncommand=nginx -g \"daemon off;\"\\nautostart=true\\nautorestart=true\\nstdout_logfile=/dev/stdout\\nstdout_logfile_maxbytes=0\\nstderr_logfile=/dev/stderr\\nstderr_logfile_maxbytes=0\\n' > /etc/supervisor/conf.d/supervisord.conf
 
 # Generar startup script (sin CRLF de Windows)
 RUN printf '#!/bin/sh\nset -e\nphp artisan migrate --force\nphp artisan storage:link 2>/dev/null || true\nphp artisan config:cache\nphp artisan route:cache\n# Ajustar nginx al PORT de Railway\nsed -i "s/listen [0-9]*/listen ${PORT:-8000}/" /etc/nginx/http.d/default.conf\nmkdir -p /run/nginx\nexec supervisord -c /etc/supervisor/conf.d/supervisord.conf\n' > /start.sh \
