@@ -1,8 +1,8 @@
-FROM php:8.2-cli-alpine
+FROM php:8.2-fpm-alpine
 
 WORKDIR /var/www/html
 
-# Dependencias del sistema
+# Dependencias del sistema + nginx + supervisor
 RUN apk add --no-cache \
     git \
     curl \
@@ -13,7 +13,9 @@ RUN apk add --no-cache \
     postgresql-dev \
     oniguruma-dev \
     nodejs \
-    npm
+    npm \
+    nginx \
+    supervisor
 
 # Extensiones PHP
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
@@ -33,23 +35,46 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copiar el resto de la aplicacion
+# Copiar la aplicacion
 COPY . .
 
-# Compilar assets de Vue.js/Vite
+# Compilar assets
 RUN npm run build
 
-# Ejecutar scripts post-instalacion de Composer
 RUN php artisan package:discover --ansi
 
-# Crear directorios y permisos de storage
+# Permisos de storage
 RUN mkdir -p storage/logs \
     storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
     bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+# Generar nginx config (sin CRLF de Windows)
+RUN printf 'server {\n\
+    listen %s;\n\
+    root /var/www/html/public;\n\
+    index index.php;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.php?$query_string;\n\
+    }\n\
+    location ~ \\.php$ {\n\
+        fastcgi_pass 127.0.0.1:9000;\n\
+        fastcgi_index index.php;\n\
+        include fastcgi_params;\n\
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;\n\
+    }\n\
+}\n' "${PORT:-8000}" > /etc/nginx/http.d/default.conf
+
+# Generar supervisord config (sin CRLF de Windows)
+RUN printf '[supervisord]\nnodaemon=true\nlogfile=/dev/null\nlogfile_maxbytes=0\n\n[program:php-fpm]\ncommand=php-fpm\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n\n[program:nginx]\ncommand=nginx -g "daemon off;"\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n' > /etc/supervisor/conf.d/supervisord.conf
+
+# Generar startup script (sin CRLF de Windows)
+RUN printf '#!/bin/sh\nset -e\nphp artisan migrate --force\nphp artisan storage:link 2>/dev/null || true\nphp artisan config:cache\nphp artisan route:cache\n# Ajustar nginx al PORT de Railway\nsed -i "s/listen [0-9]*/listen ${PORT:-8000}/" /etc/nginx/http.d/default.conf\nmkdir -p /run/nginx\nexec supervisord -c /etc/supervisor/conf.d/supervisord.conf\n' > /start.sh \
+    && chmod +x /start.sh
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link && php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
+CMD ["/bin/sh", "/start.sh"]
