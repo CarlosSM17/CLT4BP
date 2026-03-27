@@ -82,7 +82,7 @@ RUN mkdir -p /etc/supervisor/conf.d \
     && printf '[supervisord]\nnodaemon=true\nlogfile=/dev/null\nlogfile_maxbytes=0\n\n[program:php-fpm]\ncommand=php-fpm\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n\n[program:nginx]\ncommand=nginx -g "daemon off;"\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n' > /etc/supervisor/conf.d/supervisord.conf
 
 # Generar startup script (sin CRLF de Windows)
-RUN printf '#!/bin/sh\nset -e\necho "[start.sh] PORT=${PORT:-8000}"\nphp artisan migrate --force\nphp artisan db:seed --class=UserSeeder --force\nphp artisan storage:link 2>/dev/null || true\nphp artisan config:cache\nphp artisan route:cache\nsed -i "s/listen [0-9]*/listen ${PORT:-8000}/" /etc/nginx/http.d/default.conf\necho "[start.sh] nginx config:"\ncat /etc/nginx/http.d/default.conf\nnginx -t 2>&1\nmkdir -p /run/nginx\nexec supervisord -c /etc/supervisor/conf.d/supervisord.conf\n' > /start.sh \
+RUN printf '#!/bin/sh\nset -e\necho "[start.sh] PORT=${PORT:-8000}"\nphp artisan migrate --force\nphp artisan db:seed --force\nphp artisan storage:link 2>/dev/null || true\nphp artisan config:cache\nphp artisan route:cache\nsed -i "s/listen [0-9]*/listen ${PORT:-8000}/" /etc/nginx/http.d/default.conf\necho "[start.sh] nginx config:"\ncat /etc/nginx/http.d/default.conf\nnginx -t 2>&1\nmkdir -p /run/nginx\nexec supervisord -c /etc/supervisor/conf.d/supervisord.conf\n' > /start.sh \
     && chmod +x /start.sh
 
 EXPOSE 8000
