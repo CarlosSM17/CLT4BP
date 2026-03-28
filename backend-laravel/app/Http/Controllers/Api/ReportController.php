@@ -299,13 +299,22 @@ class ReportController extends Controller
                 ->where('student_id', $studentId)
                 ->first();
 
-            if (!$initialResponse || !$finalResponse) {
+            if (!$initialResponse) {
                 $result[$key] = ['available' => false];
                 continue;
             }
 
             $initial = (float) ($initialResponse->score ?? 0);
-            $final   = (float) ($finalResponse->score ?? 0);
+
+            if (!$finalResponse) {
+                $result[$key] = [
+                    'available' => false,
+                    'initial'   => round($initial, 2),
+                ];
+                continue;
+            }
+
+            $final = (float) ($finalResponse->score ?? 0);
 
             $result[$key] = [
                 'available' => true,
